@@ -1,0 +1,4 @@
+billing_date,provider,service,region,resource_id,usage_quantity,usage_unit,cost,currency,environment
+2026-01-02,aws,AmazonEC2,us-east-1,i-demo001,720,Hrs,86.40,CAD,prod
+2026-01-03,aws,AmazonEC2,us-east-1,i-demo-usd,100,Hrs,12.50,USD,prod
+2026-01-04,azure,VirtualMachines,eastus,vm-demo,48,Hrs,30.00,USD,staging

@@ -1,0 +1,4 @@
+billing_date,provider,service,region,resource_id,usage_quantity,usage_unit,cost,currency,environment
+2026-01-15,aws,AmazonEC2,us-east-1,i-demo001,720,Hrs,86.40,CAD,prod
+2026-01-20,aws,Credit,global,promo-q1,1,Credit,-25.00,CAD,prod
+2026-01-22,aws,AmazonS3,us-east-1,bucket-demo-logs,80,GB,3.20,CAD,prod

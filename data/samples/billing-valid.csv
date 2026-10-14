@@ -1,0 +1,11 @@
+billing_date,provider,service,region,resource_id,usage_quantity,usage_unit,cost,currency,environment
+2026-01-02,aws,AmazonEC2,us-east-1,i-demo001,720,Hrs,86.40,CAD,prod
+2026-01-03,aws,AmazonS3,us-east-1,bucket-demo-logs,120.5,GB,4.82,CAD,prod
+2026-01-05,aws,AmazonRDS,ca-central-1,db-demo-primary,24,Hrs,48.00,CAD,prod
+2026-01-08,aws,AmazonEC2,us-east-1,i-demo002,168,Hrs,42.00,CAD,staging
+2026-02-01,aws,AmazonEC2,us-east-1,i-demo001,720,Hrs,91.20,CAD,prod
+2026-02-04,aws,AmazonS3,us-east-1,bucket-demo-logs,140.0,GB,5.60,CAD,prod
+2026-02-10,aws,AWSLambda,us-east-1,fn-demo-ingest,2500000,Requests,3.25,CAD,prod
+2026-03-01,aws,AmazonEC2,us-east-1,i-demo001,720,Hrs,95.00,CAD,prod
+2026-03-06,aws,AmazonCloudWatch,us-east-1,cw-demo,100,GB,2.10,CAD,prod
+2026-03-12,aws,AmazonEC2,eu-west-1,i-demo-eu,336,Hrs,55.44,CAD,dev
