@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
+import { getAppMode } from "@/lib/data";
 import { resetDemoStore } from "@/lib/demo/store";
-import { isDemoMode } from "@/lib/env";
-
 
 /** Clears the in-memory demo store. Demo mode only — for local/e2e isolation. */
-export function POST() {
-  if (!isDemoMode()) {
+export async function POST() {
+  const mode = await getAppMode();
+  if (mode.kind !== "demo") {
     return NextResponse.json(
-      { message: "Demo reset is only available when NEXT_PUBLIC_DEMO_MODE=true." },
+      {
+        message:
+          "Demo reset is only available when Supabase is not configured (demo mode).",
+      },
       { status: 403 },
     );
   }

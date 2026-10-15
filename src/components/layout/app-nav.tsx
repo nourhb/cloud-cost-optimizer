@@ -11,6 +11,7 @@ import {
   Menu,
   PiggyBank,
   FileText,
+  Settings,
 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -20,6 +21,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { LogoutButton } from "@/features/auth/logout-button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -30,6 +32,7 @@ const navItems = [
   { href: "/alerts", label: "Alerts", icon: AlertTriangle },
   { href: "/recommendations", label: "Recommendations", icon: Lightbulb },
   { href: "/reports", label: "Reports", icon: FileText },
+  { href: "/settings", label: "Settings", icon: Settings },
 ] as const;
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
@@ -60,7 +63,19 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function AppSidebar() {
+type ShellNavProps = {
+  userLabel?: string;
+  demoMode: boolean;
+  supabaseUrl?: string;
+  anonKey?: string;
+};
+
+export function AppSidebar({
+  userLabel = "Demo session · CAD",
+  demoMode,
+  supabaseUrl,
+  anonKey,
+}: ShellNavProps) {
   return (
     <aside className="hidden w-56 shrink-0 border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex md:flex-col">
       <div className="flex h-14 items-center border-b border-sidebar-border px-4">
@@ -71,14 +86,23 @@ export function AppSidebar() {
       <div className="flex-1 overflow-y-auto p-3">
         <NavLinks />
       </div>
-      <div className="border-t border-sidebar-border p-3 text-xs text-muted-foreground">
-        Demo session · CAD
+      <div className="space-y-2 border-t border-sidebar-border p-3">
+        <p className="truncate text-xs text-muted-foreground">{userLabel}</p>
+        <LogoutButton
+          demoMode={demoMode}
+          supabaseUrl={supabaseUrl}
+          anonKey={anonKey}
+        />
       </div>
     </aside>
   );
 }
 
-export function MobileNav() {
+export function MobileNav({
+  demoMode,
+  supabaseUrl,
+  anonKey,
+}: ShellNavProps) {
   return (
     <div className="flex h-14 items-center justify-between border-b border-border px-4 md:hidden">
       <Link href="/dashboard" className="font-semibold tracking-tight">
@@ -96,8 +120,13 @@ export function MobileNav() {
           <SheetHeader className="border-b border-border px-4 py-3 text-left">
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
-          <div className="p-3">
+          <div className="space-y-3 p-3">
             <NavLinks />
+            <LogoutButton
+              demoMode={demoMode}
+              supabaseUrl={supabaseUrl}
+              anonKey={anonKey}
+            />
           </div>
         </SheetContent>
       </Sheet>

@@ -1,5 +1,5 @@
--- Milestone 1 stub: core tables (not applied automatically in demo mode).
--- Apply via Supabase SQL Editor or CLI when connecting a project (M2+).
+-- Core schema for Cloud Cost Optimizer (profiles, billing, budgets, alerts, recommendations).
+-- Apply via Settings → Copy SQL, or paste into the Supabase SQL Editor (free-tier project).
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -51,6 +51,16 @@ CREATE TABLE IF NOT EXISTS billing_records (
 
 CREATE INDEX IF NOT EXISTS billing_records_user_date_idx
   ON billing_records (user_id, billing_date);
+CREATE INDEX IF NOT EXISTS billing_records_user_service_date_idx
+  ON billing_records (user_id, service, billing_date);
+CREATE INDEX IF NOT EXISTS billing_records_user_region_date_idx
+  ON billing_records (user_id, region, billing_date);
+CREATE INDEX IF NOT EXISTS billing_records_user_environment_date_idx
+  ON billing_records (user_id, environment, billing_date);
+CREATE INDEX IF NOT EXISTS billing_records_user_currency_date_idx
+  ON billing_records (user_id, currency, billing_date);
+CREATE INDEX IF NOT EXISTS billing_records_import_idx
+  ON billing_records (import_id);
 
 CREATE TABLE IF NOT EXISTS budgets (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -71,6 +81,9 @@ CREATE TABLE IF NOT EXISTS budgets (
   CHECK (critical_threshold >= warning_threshold AND critical_threshold <= 100)
 );
 
+CREATE INDEX IF NOT EXISTS budgets_user_period_idx
+  ON budgets (user_id, period_start, period_end);
+
 CREATE TABLE IF NOT EXISTS alerts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES profiles (id) ON DELETE CASCADE,
@@ -87,6 +100,11 @@ CREATE TABLE IF NOT EXISTS alerts (
   resolved_at timestamptz
 );
 
+CREATE INDEX IF NOT EXISTS alerts_user_status_created_idx
+  ON alerts (user_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS alerts_user_severity_idx
+  ON alerts (user_id, severity);
+
 CREATE TABLE IF NOT EXISTS recommendations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES profiles (id) ON DELETE CASCADE,
@@ -102,3 +120,6 @@ CREATE TABLE IF NOT EXISTS recommendations (
   import_id uuid REFERENCES billing_imports (id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE INDEX IF NOT EXISTS recommendations_user_status_created_idx
+  ON recommendations (user_id, status, created_at DESC);

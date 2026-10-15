@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { configFromEnv, isEnvDemoMode } from "@/lib/supabase/config";
 
 const envSchema = z
   .object({
@@ -14,23 +15,27 @@ const envSchema = z
     CSV_MAX_ROWS: z.coerce.number().int().positive().default(50_000),
   })
   .superRefine((data, ctx) => {
+    // Soft validation: when demo is explicitly false, require env Supabase keys.
+    // UI cookie config can also enable live mode without these env vars.
     if (data.NEXT_PUBLIC_DEMO_MODE) {
       return;
     }
 
-    if (!data.NEXT_PUBLIC_SUPABASE_URL) {
+    if (!data.NEXT_PUBLIC_SUPABASE_URL && !configFromEnv()) {
       ctx.addIssue({
         code: "custom",
         path: ["NEXT_PUBLIC_SUPABASE_URL"],
-        message: "Required when NEXT_PUBLIC_DEMO_MODE=false",
+        message:
+          "Required when NEXT_PUBLIC_DEMO_MODE=false (or save URL via Settings UI)",
       });
     }
 
-    if (!data.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!data.NEXT_PUBLIC_SUPABASE_ANON_KEY && !configFromEnv()) {
       ctx.addIssue({
         code: "custom",
         path: ["NEXT_PUBLIC_SUPABASE_ANON_KEY"],
-        message: "Required when NEXT_PUBLIC_DEMO_MODE=false",
+        message:
+          "Required when NEXT_PUBLIC_DEMO_MODE=false (or save anon key via Settings UI)",
       });
     }
   });
@@ -69,9 +74,10 @@ export function getEnv(): AppEnv {
   return cached;
 }
 
+/**
+ * Sync demo check (env + whether env Supabase keys exist).
+ * Cookie-based live connections are detected via getAppMode() / getDataBackend().
+ */
 export function isDemoMode(): boolean {
-  return (
-    process.env.NEXT_PUBLIC_DEMO_MODE === "true" ||
-    process.env.NEXT_PUBLIC_DEMO_MODE === undefined
-  );
+  return isEnvDemoMode();
 }

@@ -1,4 +1,4 @@
--- Milestone 1 stub: sync profiles from auth.users on signup (wired in M2).
+-- Create a profiles row whenever a new auth.users row is inserted (signup).
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger
@@ -12,7 +12,8 @@ BEGIN
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data ->> 'display_name', split_part(NEW.email, '@', 1))
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$;

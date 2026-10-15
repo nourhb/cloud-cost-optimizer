@@ -2,40 +2,68 @@
 
 Web app for importing cloud billing CSVs, visualizing spend, setting budgets, evaluating alerts, forecasting month-end cost, and generating explainable FinOps recommendations — **without** destructive cloud operations.
 
-**Demo MVP** (this branch): CSV import → dashboard/analysis → budgets → alerts → forecast → recommendations → CSV/PDF export. Runs fully with `NEXT_PUBLIC_DEMO_MODE=true` and **no Supabase**.
+Runs in **demo mode** (in-memory store, no Supabase) or **live mode** (Supabase Auth + Postgres + RLS) after you connect a free project from the UI or `.env.local`.
 
 ## Prerequisites
 
 - Node.js 22+
 - [pnpm](https://pnpm.io/) 9+ (`corepack enable`)
-- No Docker / no paid cloud required for demo mode
+- Optional: a free [Supabase](https://supabase.com) project for Auth + Postgres
 
-## Quick start (Windows / macOS / Linux)
+## Quick start (demo — no Supabase)
 
 ```bash
 corepack enable
 pnpm install
-copy .env.example .env.local   # Windows cmd
-# or: cp .env.example .env.local
-# Keep NEXT_PUBLIC_DEMO_MODE=true
+cp .env.example .env.local   # Windows: copy .env.example .env.local
+# Keep NEXT_PUBLIC_DEMO_MODE=true and leave Supabase vars empty
 
 pnpm dev
 ```
 
-Open **[http://127.0.0.1:43123](http://127.0.0.1:43123)**.
+Open **[http://127.0.0.1:43123](http://127.0.0.1:43123)** → Imports → upload `data/samples/billing-valid.csv`.
 
-### Happy path
+## Connect Supabase (live mode)
 
-1. **Imports → New import** — upload `data/samples/billing-valid.csv`
-2. Validate & preview → **Confirm import**
-3. **Dashboard** — KPIs, Recharts trends, forecast, open alert count
-4. **Budgets** — create a tight monthly budget (e.g. 100 CAD) to trigger warnings
-5. **Alerts / Recommendations** — refresh to see rule-based findings
-6. **Reports** — download billing CSV, summary CSV, or PDF
+### 1. Create a free project
 
-## Demo store
+1. Go to [supabase.com/dashboard](https://supabase.com/dashboard) and create a project.
+2. Open **Project Settings → API** and copy the **Project URL** and **anon public** key.
+3. Do **not** copy the `service_role` key into the browser or any `NEXT_PUBLIC_*` variable.
 
-Process-global in-memory singleton (`src/lib/demo/store.ts`). Survives requests in the same `pnpm dev` process; clears on restart or `POST /api/demo/reset`.
+### 2. Apply SQL migrations (+ RLS)
+
+Either:
+
+- In the app: **Settings → Copy SQL** → paste into the Supabase **SQL Editor** → Run, or
+- Paste files from `supabase/migrations/` in order (`00001` … `00004`).
+
+This creates `profiles`, `billing_imports`, `billing_records`, `budgets`, `alerts`, `recommendations`, indexes, RLS (`user_id = auth.uid()`), and the signup → profile trigger.
+
+Enable **Email** auth under Authentication → Providers (default on most projects). For local testing you can disable “Confirm email”.
+
+### 3. Paste URL + anon key (UI or env)
+
+**Option A — Settings UI (local/dev):** open [/settings](http://127.0.0.1:43123/settings), paste URL + anon key, **Save connection**. Config is stored in an **httpOnly cookie** for this browser.
+
+**Option B — Environment (recommended for production):**
+
+```bash
+# .env.local
+NEXT_PUBLIC_DEMO_MODE=false
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+# optional, server-only, never NEXT_PUBLIC_:
+# SUPABASE_SERVICE_ROLE_KEY=
+```
+
+When URL + anon are present (cookie or env), the app uses Supabase. Otherwise it stays in demo mode (CDC §5.3).
+
+### 4. Sign up and import
+
+1. **Sign up** / **Sign in** with email + password (F01).
+2. **Imports → New import** → `data/samples/billing-valid.csv`.
+3. Use Dashboard, Budgets, Alerts, Recommendations, Reports against your private rows (RLS).
 
 ## Scripts
 
@@ -44,22 +72,24 @@ Process-global in-memory singleton (`src/lib/demo/store.ts`). Survives requests 
 | `pnpm dev` | Dev server on `127.0.0.1:43123` |
 | `pnpm build` / `pnpm start` | Production build & serve |
 | `pnpm lint` / `pnpm typecheck` / `pnpm test` | Quality gates |
-| `pnpm test:e2e` | Playwright (landing + import flow) |
+| `pnpm test:e2e` | Playwright smoke |
 | `pnpm ci` | lint + typecheck + unit tests |
 
-## Feature map (demo)
+## Feature map (CDC)
 
-| CDC | Feature | Status |
-|---|---|---|
-| F03–F04 | CSV import + validation | ✅ Demo |
-| F05–F06 | Dashboard / analysis | ✅ Demo |
-| F07 | Budgets | ✅ Demo |
-| F08 | Alerts | ✅ Demo |
-| F09 | Forecast (linear, none/low/medium) | ✅ Demo |
-| F10 | Recommendations (advisory) | ✅ Demo |
-| F11 | CSV + PDF export | ✅ Demo |
-| F12 | Import history | ✅ Demo |
-| F01 | Auth | Stub / demo session |
+| CDC | Feature | Demo | Live Supabase |
+|---|---|---|---|
+| F01 | Auth (signup/login/logout, private pages) | Stub session | Supabase Auth + proxy gate |
+| F02–F06 | Dashboard / analysis | ✅ | ✅ (RLS) |
+| F03–F04 / F12 | CSV import + history | ✅ | ✅ |
+| F07–F10 | Budgets, alerts, forecast, recommendations | ✅ | ✅ |
+| F11 | CSV + PDF export | ✅ | ✅ |
+
+## Security notes
+
+- Browser and server user clients use the **anon** key only; RLS enforces `auth.uid() = user_id`.
+- `SUPABASE_SERVICE_ROLE_KEY` is optional for MVP CRUD and must never use a `NEXT_PUBLIC_` prefix.
+- Settings UI rejects keys whose JWT `role` is `service_role`.
 
 ## Safety
 

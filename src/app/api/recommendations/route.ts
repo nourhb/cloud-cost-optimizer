@@ -1,25 +1,14 @@
 import { NextResponse } from "next/server";
-import {
-  demoUser,
-  listDemoRecommendations,
-  refreshDemoInsights,
-} from "@/lib/demo/store";
-import { isDemoMode } from "@/lib/env";
+import { withDataBackend } from "@/lib/api/backend-response";
 
-export function GET(request: Request) {
-  if (!isDemoMode()) {
-    return NextResponse.json(
-      { message: "Recommendations with Supabase are not wired yet." },
-      { status: 501 },
-    );
-  }
-
-  const url = new URL(request.url);
-  if (url.searchParams.get("refresh") === "1") {
-    refreshDemoInsights(demoUser.id);
-  }
-
-  return NextResponse.json({
-    recommendations: listDemoRecommendations(demoUser.id),
+export async function GET(request: Request) {
+  return withDataBackend(async (backend) => {
+    const url = new URL(request.url);
+    if (url.searchParams.get("refresh") === "1") {
+      await backend.refreshInsights();
+    }
+    return NextResponse.json({
+      recommendations: await backend.listRecommendations(),
+    });
   });
 }

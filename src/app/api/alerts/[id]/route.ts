@@ -1,35 +1,29 @@
 import { NextResponse } from "next/server";
-import { acknowledgeDemoAlert, demoUser } from "@/lib/demo/store";
-import { isDemoMode } from "@/lib/env";
+import { withDataBackend } from "@/lib/api/backend-response";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, context: RouteContext) {
-  if (!isDemoMode()) {
-    return NextResponse.json(
-      { message: "Alerts with Supabase are not wired yet." },
-      { status: 501 },
-    );
-  }
+  return withDataBackend(async (backend) => {
+    const { id } = await context.params;
+    let body: { action?: string } = {};
+    try {
+      body = (await request.json()) as { action?: string };
+    } catch {
+      body = {};
+    }
 
-  const { id } = await context.params;
-  let body: { action?: string } = {};
-  try {
-    body = (await request.json()) as { action?: string };
-  } catch {
-    body = {};
-  }
+    if (body.action !== "acknowledge") {
+      return NextResponse.json(
+        { message: 'Unsupported action. Send { "action": "acknowledge" }.' },
+        { status: 400 },
+      );
+    }
 
-  if (body.action !== "acknowledge") {
-    return NextResponse.json(
-      { message: 'Unsupported action. Send { "action": "acknowledge" }.' },
-      { status: 400 },
-    );
-  }
-
-  const alert = acknowledgeDemoAlert(id, demoUser.id);
-  if (!alert) {
-    return NextResponse.json({ message: "Alert not found." }, { status: 404 });
-  }
-  return NextResponse.json({ alert });
+    const alert = await backend.acknowledgeAlert(id);
+    if (!alert) {
+      return NextResponse.json({ message: "Alert not found." }, { status: 404 });
+    }
+    return NextResponse.json({ alert });
+  });
 }

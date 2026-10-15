@@ -1,5 +1,4 @@
-/** Auth domain — real Supabase email/password lands in M2. */
-
-export function getAuthPlaceholderMessage(): string {
-  return "Authentication will connect to Supabase in Milestone 2. Demo mode uses a simulated session.";
-}
+export { LoginForm } from "@/features/auth/login-form";
+export { SignupForm } from "@/features/auth/signup-form";
+export { LogoutButton } from "@/features/auth/logout-button";
+export { getAuthModeCopy } from "@/features/auth/copy";

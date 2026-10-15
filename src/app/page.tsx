@@ -3,10 +3,11 @@ import { ArrowRight, Shield, Upload, LineChart } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { isDemoMode } from "@/lib/env";
+import { getServerSupabaseConfig } from "@/lib/supabase/server";
 
-export default function LandingPage() {
-  const demo = isDemoMode();
+export default async function LandingPage() {
+  const config = await getServerSupabaseConfig();
+  const demo = !config;
 
   return (
     <div className="relative flex min-h-full flex-col overflow-hidden bg-[radial-gradient(ellipse_at_top,_#e8f3f0_0%,_#f7faf9_45%,_#eef2f7_100%)]">
@@ -17,7 +18,17 @@ export default function LandingPage() {
         <div className="flex items-center gap-2">
           {demo ? (
             <Badge variant="secondary">Demo mode</Badge>
-          ) : null}
+          ) : (
+            <Badge className="bg-teal-100 text-teal-950 hover:bg-teal-100">
+              Supabase linked
+            </Badge>
+          )}
+          <Link
+            href="/settings"
+            className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+          >
+            Settings
+          </Link>
           <Link
             href="/login"
             className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
@@ -25,7 +36,7 @@ export default function LandingPage() {
             Sign in
           </Link>
           <Link
-            href="/dashboard"
+            href={demo ? "/dashboard" : "/login"}
             className={cn(buttonVariants({ size: "sm" }))}
           >
             Open app
@@ -51,17 +62,17 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <Link
-              href="/dashboard"
+              href={demo ? "/dashboard" : "/login"}
               className={cn(buttonVariants({ size: "lg" }), "gap-2")}
             >
-              Explore the app
+              {demo ? "Explore the demo" : "Sign in to your data"}
               <ArrowRight className="size-4" aria-hidden />
             </Link>
             <Link
-              href="/signup"
+              href="/settings"
               className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
             >
-              Create account
+              Connect Supabase
             </Link>
           </div>
         </div>
@@ -96,7 +107,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-slate-200/80 bg-white/50 px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
-        Milestone 1 scaffold · Local demo runs on port 43123
+        Demo mode or live Supabase · Local app on port 43123
       </footer>
     </div>
   );

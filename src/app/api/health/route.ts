@@ -1,20 +1,27 @@
 import { NextResponse } from "next/server";
-import { isDemoMode } from "@/lib/env";
+import { getAppMode } from "@/lib/data";
 
-export function GET() {
+export async function GET() {
+  const mode = await getAppMode();
+  const live = mode.kind === "supabase";
+
   return NextResponse.json({
     ok: true,
     service: "cloud-cost-optimizer",
-    demoMode: isDemoMode(),
-    milestone: "mvp-demo",
+    demoMode: !live,
+    backend: mode.kind,
+    connectionStatus: mode.status,
+    milestone: "m2-supabase-ui",
     features: {
-      csvImport: isDemoMode(),
-      billingSummary: isDemoMode(),
-      budgets: isDemoMode(),
-      alerts: isDemoMode(),
-      forecast: isDemoMode(),
-      recommendations: isDemoMode(),
-      reports: isDemoMode(),
+      csvImport: true,
+      billingSummary: true,
+      budgets: true,
+      alerts: true,
+      forecast: true,
+      recommendations: true,
+      reports: true,
+      supabaseAuth: live,
+      connectionUi: true,
     },
   });
 }
