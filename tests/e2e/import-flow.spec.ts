@@ -24,7 +24,12 @@ test("CSV import happy path populates dashboard", async ({ page }) => {
 
   await page.goto("/dashboard");
   await expect(page.getByText("Rows in view")).toBeVisible();
-  await expect(page.getByText("10")).toBeVisible();
+  await expect(
+    page.locator("text=Rows in view").locator("..").getByText("10", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByText("Total cost")).toBeVisible();
-  await expect(page.getByText(/AmazonEC2|Daily cost trend/i).first()).toBeVisible();
+  await expect(page.getByText("Daily cost trend")).toBeVisible();
+  await expect(page.getByRole("combobox", { name: "Service" })).toContainText(
+    "AmazonEC2",
+  );
 });

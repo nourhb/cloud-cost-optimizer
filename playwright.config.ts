@@ -4,7 +4,9 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:43123";
 
 export default defineConfig({
   testDir: "tests/e2e",
-  fullyParallel: true,
+  // Demo store is process-global; serialize e2e so reset/import do not race.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
