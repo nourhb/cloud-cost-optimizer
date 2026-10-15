@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +16,10 @@ import { cn } from "@/lib/utils";
 
 export const metadata = { title: "Imports" };
 
-export const dynamic = "force-dynamic";
-
-export default function ImportsPage() {
+export default async function ImportsPage() {
+  // Opt into request-time rendering without `dynamic = "force-dynamic"`
+  // (incompatible with Next 16 cacheComponents when enabled).
+  await connection();
   const imports = listDemoImports(demoUser.id);
 
   return (
