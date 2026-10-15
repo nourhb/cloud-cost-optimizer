@@ -1,20 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { getBudgetsPlaceholderMessage } from "@/features/budgets";
+import { BudgetsPanel } from "@/features/budgets/budgets-panel";
 
 export const metadata = { title: "Budgets" };
 
 export default function BudgetsPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Budgets"
-        description="Define monthly budgets and warning thresholds for your cloud spend."
+        description="Create and edit monthly global or per-service budgets with warning and critical thresholds."
       />
-      <EmptyState
-        title="No budgets configured"
-        description={getBudgetsPlaceholderMessage()}
-      />
+      <BudgetsPanel />
     </div>
   );
 }

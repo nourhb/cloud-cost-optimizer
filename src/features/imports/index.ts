@@ -1,5 +1,9 @@
-/** CSV import domain — parsing and commit land in M3. */
-
-export function getImportsPlaceholderMessage(): string {
-  return "CSV import, validation, and history will be available in Milestone 3.";
-}
+export {
+  parseBillingCsv,
+  CsvLimitError,
+  CsvParseError,
+  type ParseCsvOptions,
+  type ParseCsvResult,
+} from "./parse-csv";
+export { buildDedupeKey, normalizeDecimal } from "./dedupe";
+export { detectCurrencyMode, previewSample } from "./preview";

@@ -1,21 +1,7 @@
 import { z } from "zod";
+import { isValidIsoDate } from "@/lib/dates";
 
-/** Expected CSV columns (CDC §4.2). Parsing logic arrives in M3. */
-export const billingCsvRowSchema = z.object({
-  billing_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  provider: z.string().min(1),
-  service: z.string().min(1),
-  region: z.string().min(1),
-  resource_id: z.string().min(1),
-  usage_quantity: z.string().min(1),
-  usage_unit: z.string().min(1),
-  cost: z.string().min(1),
-  currency: z.string().length(3),
-  environment: z.string().min(1),
-});
-
-export type BillingCsvRow = z.infer<typeof billingCsvRowSchema>;
-
+/** Expected CSV columns (CDC §4.2). */
 export const BILLING_CSV_COLUMNS = [
   "billing_date",
   "provider",
@@ -28,3 +14,35 @@ export const BILLING_CSV_COLUMNS = [
   "currency",
   "environment",
 ] as const;
+
+export type BillingCsvColumn = (typeof BILLING_CSV_COLUMNS)[number];
+
+const decimalString = z
+  .string()
+  .trim()
+  .regex(/^-?\d+(\.\d+)?$/, "Must be a valid number");
+
+export const billingCsvRowSchema = z.object({
+  billing_date: z
+    .string()
+    .trim()
+    .refine(isValidIsoDate, "Must be a valid ISO date (YYYY-MM-DD)"),
+  provider: z.string().trim().min(1, "Provider is required"),
+  service: z.string().trim().min(1, "Service is required"),
+  region: z.string().trim().min(1, "Region is required"),
+  resource_id: z.string().trim().min(1, "Resource ID is required"),
+  usage_quantity: decimalString,
+  usage_unit: z.string().trim().min(1, "Usage unit is required"),
+  cost: decimalString,
+  currency: z
+    .string()
+    .trim()
+    .transform((value) => value.toUpperCase())
+    .pipe(z.string().length(3, "Currency must be a 3-letter ISO code")),
+  environment: z.string().trim().min(1, "Environment is required"),
+});
+
+export type BillingCsvRow = z.infer<typeof billingCsvRowSchema>;
+
+/** Raw row shape after Papa Parse (all string values). */
+export const billingCsvRawRowSchema = z.record(z.string(), z.unknown());

@@ -1,3 +1,5 @@
+export { evaluateAlerts, type EvaluatedAlert } from "./evaluate";
+
 export function getAlertsPlaceholderMessage(): string {
-  return "Alert rules and notifications arrive in Milestone 5.";
+  return "Alerts are evaluated after each import and when the dashboard refreshes.";
 }

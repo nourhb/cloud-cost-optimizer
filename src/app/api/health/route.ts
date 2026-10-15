@@ -6,6 +6,15 @@ export function GET() {
     ok: true,
     service: "cloud-cost-optimizer",
     demoMode: isDemoMode(),
-    milestone: 1,
+    milestone: "mvp-demo",
+    features: {
+      csvImport: isDemoMode(),
+      billingSummary: isDemoMode(),
+      budgets: isDemoMode(),
+      alerts: isDemoMode(),
+      forecast: isDemoMode(),
+      recommendations: isDemoMode(),
+      reports: isDemoMode(),
+    },
   });
 }

@@ -1,20 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { getImportsPlaceholderMessage } from "@/features/imports";
+import { ImportUploadForm } from "@/features/imports/import-upload-form";
 
 export const metadata = { title: "New import" };
 
 export default function NewImportPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="New import"
-        description="Upload a billing CSV for preview and validation. Commit lands in Milestone 3."
+        description="Upload a billing CSV, review validation results, then confirm to load spend into the demo store."
       />
-      <EmptyState
-        title="CSV upload coming soon"
-        description={getImportsPlaceholderMessage()}
-      />
+      <ImportUploadForm />
     </div>
   );
 }

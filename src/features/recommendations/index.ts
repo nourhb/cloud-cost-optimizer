@@ -1,3 +1,8 @@
+export {
+  evaluateRecommendations,
+  type EvaluatedRecommendation,
+} from "./rules";
+
 export function getRecommendationsPlaceholderMessage(): string {
-  return "Optimization recommendations arrive in Milestone 6.";
+  return "Rule-based, explainable recommendations appear after billing data is imported. Advisory only — no cloud changes.";
 }

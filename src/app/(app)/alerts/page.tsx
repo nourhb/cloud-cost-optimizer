@@ -1,20 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { getAlertsPlaceholderMessage } from "@/features/alerts";
+import { AlertsPanel } from "@/features/alerts/alerts-panel";
 
 export const metadata = { title: "Alerts" };
 
 export default function AlertsPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Alerts"
-        description="Budget thresholds and unusual spend patterns surface here."
+        description="Budget thresholds and unusual spend patterns. Recomputed on import and dashboard refresh."
       />
-      <EmptyState
-        title="No alerts"
-        description={getAlertsPlaceholderMessage()}
-      />
+      <AlertsPanel />
     </div>
   );
 }

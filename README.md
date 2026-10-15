@@ -1,39 +1,41 @@
 # Cloud Cost Optimizer
 
-Web app for importing cloud billing CSVs, visualizing spend, setting budgets, and generating explainable FinOps recommendations — **without** destructive cloud operations.
+Web app for importing cloud billing CSVs, visualizing spend, setting budgets, evaluating alerts, forecasting month-end cost, and generating explainable FinOps recommendations — **without** destructive cloud operations.
 
-**Milestone 1** delivers the scaffold: Next.js app shell, demo mode, tooling, and docs. Business features (import, charts, budgets, alerts, forecast, recommendations, export) arrive in later milestones.
+**Demo MVP** (this branch): CSV import → dashboard/analysis → budgets → alerts → forecast → recommendations → CSV/PDF export. Runs fully with `NEXT_PUBLIC_DEMO_MODE=true` and **no Supabase**.
 
 ## Prerequisites
 
 - Node.js 22+
-- [pnpm](https://pnpm.io/) 9+ (repo pins `packageManager`; enable with `corepack enable`)
-- No Docker required for demo mode
-- No Supabase account required when `NEXT_PUBLIC_DEMO_MODE=true`
+- [pnpm](https://pnpm.io/) 9+ (`corepack enable`)
+- No Docker / no paid cloud required for demo mode
 
-## Quick start (demo mode)
+## Quick start (Windows / macOS / Linux)
 
 ```bash
 corepack enable
 pnpm install
-cp .env.example .env.local
-# Keep NEXT_PUBLIC_DEMO_MODE=true (default)
+copy .env.example .env.local   # Windows cmd
+# or: cp .env.example .env.local
+# Keep NEXT_PUBLIC_DEMO_MODE=true
 
 pnpm dev
 ```
 
 Open **[http://127.0.0.1:43123](http://127.0.0.1:43123)**.
 
-The app binds to port **43123** by default (`pnpm dev` / `pnpm start`).
+### Happy path
 
-## Demo mode vs Supabase
+1. **Imports → New import** — upload `data/samples/billing-valid.csv`
+2. Validate & preview → **Confirm import**
+3. **Dashboard** — KPIs, Recharts trends, forecast, open alert count
+4. **Budgets** — create a tight monthly budget (e.g. 100 CAD) to trigger warnings
+5. **Alerts / Recommendations** — refresh to see rule-based findings
+6. **Reports** — download billing CSV, summary CSV, or PDF
 
-| Mode | Env | What you get |
-|---|---|---|
-| **Demo (default)** | `NEXT_PUBLIC_DEMO_MODE=true` | Landing + authenticated-looking shell with empty-state placeholders. In-memory fixtures only. **No** Supabase URL/keys required. |
-| **Supabase** | `NEXT_PUBLIC_DEMO_MODE=false` + URL + anon key | Real Auth / Postgres / RLS (wired from Milestone 2). Service role stays server-only. |
+## Demo store
 
-Never put `SUPABASE_SERVICE_ROLE_KEY` behind a `NEXT_PUBLIC_` prefix. Never commit real secrets — only `.env.example` is versioned.
+Process-global in-memory singleton (`src/lib/demo/store.ts`). Survives requests in the same `pnpm dev` process; clears on restart or `POST /api/demo/reset`.
 
 ## Scripts
 
@@ -41,32 +43,30 @@ Never put `SUPABASE_SERVICE_ROLE_KEY` behind a `NEXT_PUBLIC_` prefix. Never comm
 |---|---|
 | `pnpm dev` | Dev server on `127.0.0.1:43123` |
 | `pnpm build` / `pnpm start` | Production build & serve |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | TypeScript (`tsc --noEmit`) |
-| `pnpm test` | Vitest unit tests |
-| `pnpm test:e2e` | Playwright smoke (starts dev server if needed) |
+| `pnpm lint` / `pnpm typecheck` / `pnpm test` | Quality gates |
+| `pnpm test:e2e` | Playwright (landing + import flow) |
 | `pnpm ci` | lint + typecheck + unit tests |
 
-## Project layout
+## Feature map (demo)
 
-See [docs/architecture.md](./docs/architecture.md) for the full structure. Key paths:
+| CDC | Feature | Status |
+|---|---|---|
+| F03–F04 | CSV import + validation | ✅ Demo |
+| F05–F06 | Dashboard / analysis | ✅ Demo |
+| F07 | Budgets | ✅ Demo |
+| F08 | Alerts | ✅ Demo |
+| F09 | Forecast (linear, none/low/medium) | ✅ Demo |
+| F10 | Recommendations (advisory) | ✅ Demo |
+| F11 | CSV + PDF export | ✅ Demo |
+| F12 | Import history | ✅ Demo |
+| F01 | Auth | Stub / demo session |
 
-- `src/app/` — App Router pages & Route Handlers
-- `src/features/` — Domain modules (placeholders in M1)
-- `src/components/` — UI shell + shadcn primitives
-- `supabase/migrations/` — SQL stubs (not auto-applied in demo)
-- `data/samples/` — Synthetic billing CSVs for later import work
-- `tests/unit`, `tests/e2e` — Vitest & Playwright
+## Safety
 
-## Safety / product limits
-
-- **No destructive cloud ops** — the product never deletes, stops, or resizes cloud resources. Recommendations are consultative only.
-- CSV size limits (when import lands): 5 MiB / 50 000 rows (see `.env.example`).
-- No FX conversion in MVP; totals stay per currency (CAD default).
-
-## CI
-
-GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, Vitest, and a Playwright smoke suite on push/PR.
+- No destructive cloud ops
+- No FX conversion; totals per currency
+- Forecast never labeled **high** with the MVP linear formula
+- Recommendations always include limitations
 
 ## License
 

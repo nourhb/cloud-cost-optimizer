@@ -1,20 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { getBillingPlaceholderMessage } from "@/features/billing";
+import { BillingDashboard } from "@/features/billing/billing-dashboard";
 
 export const metadata = { title: "Analysis" };
 
 export default function AnalysisPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Analysis"
-        description="Break down costs by service, region, environment, and period."
+        description="Break down costs by service, region, environment, provider, and period."
       />
-      <EmptyState
-        title="Nothing to analyze"
-        description={getBillingPlaceholderMessage()}
-      />
+      <BillingDashboard title="Analysis" showTopServices />
     </div>
   );
 }

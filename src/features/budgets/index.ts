@@ -1,3 +1,9 @@
+export {
+  evaluateBudgetSpend,
+  recordsInBudgetScope,
+  type BudgetSpend,
+} from "./evaluate";
+
 export function getBudgetsPlaceholderMessage(): string {
-  return "Budget management arrives in Milestone 5.";
+  return "Create a monthly global or per-service budget to track spend against warning and critical thresholds.";
 }

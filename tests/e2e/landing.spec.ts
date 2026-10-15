@@ -8,7 +8,8 @@ test("landing page shows Cloud Cost Optimizer brand", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Explore the app" })).toBeVisible();
 });
 
-test("app shell dashboard empty state is reachable", async ({ page }) => {
+test("app shell dashboard is reachable in demo mode", async ({ page }) => {
+  await page.request.post("/api/demo/reset");
   await page.goto("/dashboard");
   await expect(
     page.getByRole("heading", { name: "Dashboard", exact: true }),
@@ -16,3 +17,4 @@ test("app shell dashboard empty state is reachable", async ({ page }) => {
   await expect(page.getByText("No billing data yet")).toBeVisible();
   await expect(page.getByText("Demo mode").first()).toBeVisible();
 });
+

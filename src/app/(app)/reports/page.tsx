@@ -1,20 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-import { getReportsPlaceholderMessage } from "@/features/reports";
+import { ReportsPanel } from "@/features/reports/reports-panel";
 
 export const metadata = { title: "Reports" };
 
 export default function ReportsPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Reports"
         description="Export analysis as CSV or PDF for stakeholders."
       />
-      <EmptyState
-        title="No reports yet"
-        description={getReportsPlaceholderMessage()}
-      />
+      <ReportsPanel />
     </div>
   );
 }
